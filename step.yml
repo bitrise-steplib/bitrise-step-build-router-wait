@@ -1,0 +1,37 @@
+title: "Bitrise Wait for Build"
+summary: "Waiting for the given builds to be finished"
+description: "Waiting for the given builds to be finished"
+website: https://github.com/bitrise-steplib/bitrise-step-build-router-wait
+source_code_url: https://github.com/bitrise-steplib/bitrise-step-build-router-wait
+support_url: https://github.com/bitrise-steplib/bitrise-step-build-router-wait/issues
+host_os_tags:
+  - osx-10.10
+  - ubuntu-16.04
+
+type_tags:
+  - utility
+
+is_always_run: true
+is_skippable: false
+
+toolkit:
+  go:
+    package_name: github.com/bitrise-steplib/bitrise-step-build-router-wait
+
+inputs:
+  - access_token:
+    opts:
+      title: Bitrise Access Token
+      summary: Your access token that has access to the app in you want to run workflows.
+      description: |
+          Your access token that has access to the app in you want to run workflows.
+          
+          To acquire a Personal Access Token for your user, sign in with that user on [bitrise.io](https://bitrise.io),  
+          go to your Account Settings page, and select the [Security tab](https://www.bitrise.io/me/profile#/security) on the left side.
+      is_required: true
+  - buildslugs: $ROUTER_STARTED_BUILD_SLUGS
+    opts:
+      title: Build Slugs
+      summary: The build slug(s) to check. One build slug per line.
+      description: The build slug(s) to check. One build slug per line.
+      is_required: true
