@@ -28,6 +28,7 @@ inputs:
           To acquire a `Personal Access Token` for your user, sign in with that user on [bitrise.io](https://bitrise.io),  
           go to your `Account Settings` page, and select the [Security tab](https://www.bitrise.io/me/profile#/security) on the left side.
       is_required: true
+      is_sensitive: true
   - buildslugs: $ROUTER_STARTED_BUILD_SLUGS
     opts:
       title: Build Slugs
