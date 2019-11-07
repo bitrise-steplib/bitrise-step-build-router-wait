@@ -41,19 +41,20 @@ func main() {
 	buildSlugs := strings.Split(cfg.BuildSlugs, "\n")
 
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
+		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
 		switch build.Status {
 		case 0:
-			log.Printf("- %s %s", build.TriggeredWorkflow, build.StatusText)
+			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
 		case 1:
-			log.Donef("- %s successful", build.TriggeredWorkflow)
+			log.Donef("- %s successful %s)", build.TriggeredWorkflow, buildURL)
 		case 2:
-			log.Errorf("- %s failed", build.TriggeredWorkflow)
+			log.Errorf("- %s failed %s", build.TriggeredWorkflow, buildURL)
 		case 3:
-			log.Warnf("- %s aborted", build.TriggeredWorkflow)
+			log.Warnf("- %s aborted %s", build.TriggeredWorkflow, buildURL)
 		case 4:
-			log.Infof("- %s cancelled", build.TriggeredWorkflow)
+			log.Infof("- %s cancelled %s", build.TriggeredWorkflow, buildURL)
 		}
 	}); err != nil {
-		failf("An error occoured: %s", err)
+		failf("An error occurred: %s", err)
 	}
 }
