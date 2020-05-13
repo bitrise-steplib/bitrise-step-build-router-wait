@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/bitrise-io/go-utils/log"
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 // Build ...
@@ -42,24 +46,95 @@ type StartResponse struct {
 	TriggeredWorkflow string `json:"triggered_workflow"`
 }
 
+// Environment ...
+type Environment struct {
+	MappedTo string `json:"mapped_to"`
+	Value    string `json:"value"`
+}
+
 // App ...
 type App struct {
-	Slug, AccessToken string
+	BaseURL, Slug, AccessToken string
+	IsDebugRetryTimings        bool
+}
+
+// NewAppWithDefaultURL returns a Bitrise client with the default URl
+func NewAppWithDefaultURL(slug, accessToken string) App {
+	return App{
+		BaseURL:     "https://api.bitrise.io",
+		Slug:        slug,
+		AccessToken: accessToken,
+	}
+}
+
+// RetryLogAdaptor adapts the retryablehttp.Logger interface to the go-utils logger.
+type RetryLogAdaptor struct{}
+
+// Printf implements the retryablehttp.Logger interface
+func (*RetryLogAdaptor) Printf(fmtStr string, vars ...interface{}) {
+	switch {
+	case strings.HasPrefix(fmtStr, "[DEBUG]"):
+		log.Debugf(strings.TrimSpace(fmtStr[7:]), vars...)
+	case strings.HasPrefix(fmtStr, "[ERR]"):
+		log.Errorf(strings.TrimSpace(fmtStr[5:]), vars...)
+	case strings.HasPrefix(fmtStr, "[ERROR]"):
+		log.Errorf(strings.TrimSpace(fmtStr[7:]), vars...)
+	case strings.HasPrefix(fmtStr, "[WARN]"):
+		log.Warnf(strings.TrimSpace(fmtStr[6:]), vars...)
+	case strings.HasPrefix(fmtStr, "[INFO]"):
+		log.Infof(strings.TrimSpace(fmtStr[6:]), vars...)
+	default:
+		log.Printf(fmtStr, vars...)
+	}
+}
+
+// NewRetryableClient returns a retryable HTTP client
+// isDebugRetryTimings sets the timeouts shoreter for testing purposes
+func NewRetryableClient(isDebugRetryTimings bool) *retryablehttp.Client {
+	client := retryablehttp.NewClient()
+	client.CheckRetry = retryablehttp.DefaultRetryPolicy
+	client.Backoff = retryablehttp.DefaultBackoff
+	client.Logger = &RetryLogAdaptor{}
+	client.ErrorHandler = retryablehttp.PassthroughErrorHandler
+	if !isDebugRetryTimings {
+		client.RetryWaitMin = 10 * time.Second
+		client.RetryWaitMax = 60 * time.Second
+		client.RetryMax = 5
+	} else {
+		client.RetryWaitMin = 100 * time.Millisecond
+		client.RetryWaitMax = 400 * time.Millisecond
+		client.RetryMax = 3
+	}
+
+	return client
 }
 
 // GetBuild ...
-func (app App) GetBuild(buildSlug string) (Build, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.bitrise.io/v0.1/apps/%s/builds/%s", app.Slug, buildSlug), nil)
+func (app App) GetBuild(buildSlug string) (build Build, err error) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s", app.BaseURL, app.Slug, buildSlug), nil)
 	if err != nil {
 		return Build{}, err
 	}
 
 	req.Header.Add("Authorization", "token "+app.AccessToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return Build{}, fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	client := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := client.Do(retryReq)
 	if err != nil {
 		return Build{}, err
 	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -70,15 +145,15 @@ func (app App) GetBuild(buildSlug string) (Build, error) {
 		return Build{}, fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
 	}
 
-	var build buildResponse
-	if err := json.Unmarshal(respBody, &build); err != nil {
+	var buildResponse buildResponse
+	if err := json.Unmarshal(respBody, &buildResponse); err != nil {
 		return Build{}, fmt.Errorf("failed to decode response, body: %s, error: %s", respBody, err)
 	}
-	return build.Data, nil
+	return buildResponse.Data, nil
 }
 
 // StartBuild ...
-func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNumber string) (StartResponse, error) {
+func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNumber string, environments []Environment) (startResponse StartResponse, err error) {
 	var params map[string]interface{}
 	if err := json.Unmarshal(buildParams, &params); err != nil {
 		return StartResponse{}, err
@@ -86,17 +161,13 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 	params["workflow_id"] = workflow
 	params["skip_git_status_report"] = true
 
-	sourceBuildNumber := map[string]interface{}{
-		"is_expand": true,
-		"mapped_to": "SOURCE_BITRISE_BUILD_NUMBER",
-		"value":     buildNumber,
+	sourceBuildNumber := Environment{
+		MappedTo: "SOURCE_BITRISE_BUILD_NUMBER",
+		Value:    buildNumber,
 	}
 
-	if envs, ok := params["environments"].([]interface{}); ok {
-		params["environments"] = append(envs, sourceBuildNumber)
-	} else {
-		params["environments"] = []interface{}{sourceBuildNumber}
-	}
+	envs := []Environment{sourceBuildNumber}
+	params["environments"] = append(envs, environments...)
 
 	b, err := json.Marshal(params)
 	if err != nil {
@@ -109,16 +180,29 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 		return StartResponse{}, nil
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.bitrise.io/v0.1/apps/%s/builds", app.Slug), bytes.NewReader(b))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds", app.BaseURL, app.Slug), bytes.NewReader(b))
 	if err != nil {
 		return StartResponse{}, nil
 	}
 	req.Header.Add("Authorization", "token "+app.AccessToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return StartResponse{}, fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := retryClient.Do(retryReq)
 	if err != nil {
 		return StartResponse{}, nil
 	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
