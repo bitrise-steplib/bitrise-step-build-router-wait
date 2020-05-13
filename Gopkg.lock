@@ -3,6 +3,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:caf5b6526ab478df1debb4048cc99489d3954975457c4ba63441f489c9053ea2"
+  name = "github.com/bitrise-io/go-steputils"
+  packages = ["stepconf"]
+  pruneopts = "UT"
+  revision = "94490ca44ddb645764676a94988f6fc7e3187383"
+
+[[projects]]
+  branch = "master"
   digest = "1:cc12e8d1756854b6bd1a806e0e62f2e2ce1e275be1f1d67b5e80dc5321db5fba"
   name = "github.com/bitrise-io/go-utils"
   packages = [
@@ -15,20 +23,12 @@
   revision = "e212188d99b41373b4ff8b69e7b1f677bc427bde"
 
 [[projects]]
-  branch = "TOOL-2012-network-failure-retry"
+  branch = "master"
   digest = "1:65fc705009e4d9a6dcd87dbf98d3399412bc522717ea0c630e7d583b6bdf3583"
   name = "github.com/bitrise-steplib/bitrise-step-build-router-start"
   packages = ["bitrise"]
   pruneopts = "UT"
-  revision = "efc27f7bef6b09bc003a46dd04568935f5c531c8"
-
-[[projects]]
-  branch = "master"
-  digest = "1:caf5b6526ab478df1debb4048cc99489d3954975457c4ba63441f489c9053ea2"
-  name = "github.com/bitrise-tools/go-steputils"
-  packages = ["stepconf"]
-  pruneopts = "UT"
-  revision = "94490ca44ddb645764676a94988f6fc7e3187383"
+  revision = "8c34093730ac44ce30902d8865e99492ae1df41d"
 
 [[projects]]
   digest = "1:af105c7c5dc0b4ae41991f122cae860b9600f7d226072c2a83127048c991660c"
@@ -50,9 +50,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/bitrise-io/go-steputils/stepconf",
     "github.com/bitrise-io/go-utils/log",
     "github.com/bitrise-steplib/bitrise-step-build-router-start/bitrise",
-    "github.com/bitrise-tools/go-steputils/stepconf",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

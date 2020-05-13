@@ -1,15 +1,15 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/bitrise-io/go-utils"
-
-[[constraint]]
-  name = "github.com/bitrise-steplib/bitrise-step-build-router-start"
-    branch = "TOOL-2012-network-failure-retry"
+  name = "github.com/bitrise-io/go-steputils"
 
 [[constraint]]
   branch = "master"
-  name = "github.com/bitrise-tools/go-steputils"
+  name = "github.com/bitrise-io/go-utils"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bitrise-steplib/bitrise-step-build-router-start"
 
 [prune]
   go-tests = true
