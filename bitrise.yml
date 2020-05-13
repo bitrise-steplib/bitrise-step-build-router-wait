@@ -19,9 +19,11 @@ workflows:
         inputs:
         - workflows: $TEST_WORKFLOWS
         - access_token: $ACCESS_TOKEN
+        - verbose: true
     - path::./:
         inputs:
         - access_token: $ACCESS_TOKEN
+        - verbose: true
 
   # ----------------------------------------------------------------
   # --- workflows to Share this step into a Step Library

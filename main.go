@@ -32,6 +32,8 @@ func main() {
 	stepconf.Print(cfg)
 	fmt.Println()
 
+	log.SetEnableDebugLog(cfg.IsVerboseLog)
+
 	app := bitrise.NewAppWithDefaultURL(cfg.AppSlug, string(cfg.AccessToken))
 
 	log.Infof("Waiting for builds:")
