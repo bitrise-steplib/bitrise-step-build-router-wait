@@ -14,6 +14,8 @@ workflows:
     - go-list:
     - golint:
     - errcheck:
+        run_if: |-
+          {{enveq "ERRCHECK_DISABLE" ""}}
     - go-test:
     - build-router-start:
         inputs:
