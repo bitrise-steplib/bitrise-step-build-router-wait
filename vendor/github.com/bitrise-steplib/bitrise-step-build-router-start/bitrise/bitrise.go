@@ -197,6 +197,12 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 		return StartResponse{}, nil
 	}
 
+	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
+	b, err = json.Marshal(rm)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds", app.BaseURL, app.Slug), bytes.NewReader(b))
 	if err != nil {
 		return StartResponse{}, nil
