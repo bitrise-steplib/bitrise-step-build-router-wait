@@ -15,7 +15,7 @@ type Config struct {
 	AppSlug      string          `env:"BITRISE_APP_SLUG,required"`
 	AccessToken  stepconf.Secret `env:"access_token,required"`
 	BuildSlugs   string          `env:"buildslugs,required"`
-	SavePath   string            `env:"save_path"`
+	SavePath     string          `env:"save_path"`
 	IsVerboseLog bool            `env:"verbose,required"`
 }
 
@@ -43,11 +43,12 @@ func main() {
 
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
 		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
+
 		switch build.Status {
 		case 0:
 			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
 		case 1:
-			log.Donef("- %s successful %s)", build.TriggeredWorkflow, buildURL)
+			log.Printf("- %s successful %s)", build.TriggeredWorkflow, buildURL)
 		case 2:
 			log.Errorf("- %s failed %s", build.TriggeredWorkflow, buildURL)
 		case 3:
@@ -55,27 +56,26 @@ func main() {
 		case 4:
 			log.Infof("- %s cancelled %s", build.TriggeredWorkflow, buildURL)
 		}
-
-		if cfg.SavePath != "" {
-			artifactSlugs, err := app.GetBuildArtifacts(build.Slug);
-			if err != nil {
-				failf("Failed to start build, error: %s", err)
-			}
-			fmt.Println("artifactSlugs: %s", artifactSlugs)
-			for _, artifact := range artifactSlugs.data {
-				artifactObj, err := app.GetBuildArtifact(artifact.slug)
+		if build.Status != 0 {
+			if cfg.SavePath != "" {
+				artifactsResponse, err := app.GetBuildArtifacts(build.Slug)
 				if err != nil {
-					return fmt.Errorf("failed to get artifact info, error: %s", err, buildURL)
+					failf("Failed to start build, error: %s", err)
 				}
+				for _, artifactSlug := range artifactsResponse.ArtifactSlugs {
+					artifactObj, err := app.GetBuildArtifact(build.Slug, artifactSlug.ArtifactSlug)
+					if err != nil {
+						failf("failed to get artifact info, error: %s", err)
+					}
 
-				err := app.DownloadArtifact(cfg.SavePath, artifactObj.data.expiring_download_url)
-				if err != nil {
-					fmt.Errorf("Failed to download artifact, error: %s", err, buildURL)
+					err2 := app.DownloadArtifact(cfg.SavePath+artifactObj.Artifact.ArtifactTitle, artifactObj.Artifact.ArtifactURL)
+					if err2 != nil {
+						failf("Failed to download artifact, error: %s", err2)
+					}
+					log.Printf("Downloaded: " + cfg.SavePath + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
 				}
-				log.Printf("Downloaded: " + artifactSlug + " to path " + cfg.SavePath)
 			}
 		}
-
 	}); err != nil {
 		failf("An error occurred: %s", err)
 	}
