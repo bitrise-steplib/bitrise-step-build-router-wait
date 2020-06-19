@@ -61,7 +61,7 @@ func main() {
 			if err != nil {
 				failf("Failed to start build, error: %s", err)
 			}
-			fmt.Println("artifactSlugs: ", artifactSlugs)
+			fmt.Println("artifactSlugs: %s", artifactSlugs)
 			for _, artifact := range artifactSlugs.data {
 				artifactObj, err := app.GetBuildArtifact(artifact.slug)
 				if err != nil {
