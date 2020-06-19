@@ -217,7 +217,7 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 
 // GetBuildArtifacts ...
 func (app App) GetBuildArtifacts(buildSlug string) (startResponse StartResponse, err error){
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug))
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug), nil)
 	if err != nil {
 		return StartResponse{}, nil
 	}
@@ -259,7 +259,7 @@ func (app App) GetBuildArtifacts(buildSlug string) (startResponse StartResponse,
 
 // GetBuildArtifact ...
 func (app App) GetBuildArtifact(buildSlug string, artifactSlug string) (startResponse StartResponse, err error){
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug))
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug), nil)
 	if err != nil {
 		return StartResponse{}, nil
 	}
