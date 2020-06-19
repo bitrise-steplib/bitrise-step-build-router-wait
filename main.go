@@ -72,7 +72,7 @@ func main() {
 					if downloadErr != nil {
 						failf("Failed to download artifact, error: %s", downloadErr)
 					}
-					log.Donef("Downloaded: " + cfg.SavePath + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
+					log.Donef("Downloaded: " + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
 				}
 			}
 		}
