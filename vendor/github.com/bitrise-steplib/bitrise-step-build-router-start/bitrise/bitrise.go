@@ -301,7 +301,7 @@ func (app App) GetBuildArtifact(buildSlug string, artifactSlug string) (startRes
 }
 
 // DownloadArtifact ...
-func DownloadFile(filepath string, url string) error {
+func DownloadArtifact(filepath string, url string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
