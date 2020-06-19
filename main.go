@@ -57,18 +57,18 @@ func main() {
 		}
 
 		if cfg.SavePath != "" {
-			artifactSlugs, err := app.GetBuildArtifacts(buildSlugs);
+			artifactSlugs, err := app.GetBuildArtifacts(build.Slug);
 			if err != nil {
 				failf("Failed to start build, error: %s", err)
 			}
 
-			for _, artifactSlug := range artifactSlugs {
+			for _, artifactSlug := range artifactSlugs.data {
 				artifact, err := app.GetBuildArtifact(artifactSlug)
 				if err != nil {
 					return fmt.Errorf("failed to get artifact info, error: %s", err)
 				}
 
-				err := app.DownloadArtifact(cfg.SavePath, artifact.expiring_download_url)
+				err := app.DownloadArtifact(cfg.SavePath, artifact.data.expiring_download_url)
 				if err != nil {
 					failf("Failed to download artifact, error: %s", err)
 				}
