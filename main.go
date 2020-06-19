@@ -65,12 +65,12 @@ func main() {
 			for _, artifact := range artifactSlugs.data {
 				artifactObj, err := app.GetBuildArtifact(artifact.slug)
 				if err != nil {
-					return fmt.Errorf("failed to get artifact info, error: %s", err)
+					return fmt.Errorf("failed to get artifact info, error: %s", err, buildURL)
 				}
 
 				err := app.DownloadArtifact(cfg.SavePath, artifactObj.data.expiring_download_url)
 				if err != nil {
-					failf("Failed to download artifact, error: %s", err)
+					fmt.Errorf("Failed to download artifact, error: %s", err, buildURL)
 				}
 				log.Printf("Downloaded: " + artifactSlug + " to path " + cfg.SavePath)
 			}
