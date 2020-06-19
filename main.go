@@ -48,7 +48,7 @@ func main() {
 		case 0:
 			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
 		case 1:
-			log.Printf("- %s successful %s)", build.TriggeredWorkflow, buildURL)
+			log.Donef("- %s successful %s)", build.TriggeredWorkflow, buildURL)
 		case 2:
 			log.Errorf("- %s failed %s", build.TriggeredWorkflow, buildURL)
 		case 3:
@@ -72,7 +72,7 @@ func main() {
 					if err2 != nil {
 						failf("Failed to download artifact, error: %s", err2)
 					}
-					log.Printf("Downloaded: " + cfg.SavePath + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
+					log.Donef("Downloaded: " + cfg.SavePath + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
 				}
 			}
 		}
