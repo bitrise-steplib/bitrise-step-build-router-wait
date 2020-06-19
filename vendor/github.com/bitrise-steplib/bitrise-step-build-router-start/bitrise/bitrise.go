@@ -175,12 +175,6 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 		return StartResponse{}, nil
 	}
 
-	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
-	b, err = json.Marshal(rm)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds", app.BaseURL, app.Slug), bytes.NewReader(b))
 	if err != nil {
 		return StartResponse{}, nil
@@ -222,31 +216,7 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 }
 
 // GetBuildArtifacts ...
-func (app App) GetBuildArtifacts(buildSlug string, environments []Environment) (startResponse StartResponse, err error){
-	var params map[string]interface{}
-	if err := json.Unmarshal(buildParams, &params); err != nil {
-		return StartResponse{}, err
-	}
-
-	sourceBuildNumber := Environment{
-		MappedTo: "SOURCE_BITRISE_BUILD_NUMBER",
-		Value:    buildNumber,
-	}
-
-	envs := []Environment{sourceBuildNumber}
-	params["environments"] = append(envs, environments...)
-
-	b, err := json.Marshal(params)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
-	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
-	b, err = json.Marshal(rm)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
+func (app App) GetBuildArtifacts(buildSlug string) (startResponse StartResponse, err error){
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug))
 	if err != nil {
 		return StartResponse{}, nil
@@ -288,31 +258,7 @@ func (app App) GetBuildArtifacts(buildSlug string, environments []Environment) (
 }
 
 // GetBuildArtifact ...
-func (app App) GetBuildArtifact(buildSlug string, artifactSlug string, environments []Environment) (startResponse StartResponse, err error){
-	var params map[string]interface{}
-	if err := json.Unmarshal(buildParams, &params); err != nil {
-		return StartResponse{}, err
-	}
-
-	sourceBuildNumber := Environment{
-		MappedTo: "SOURCE_BITRISE_BUILD_NUMBER",
-		Value:    buildNumber,
-	}
-
-	envs := []Environment{sourceBuildNumber}
-	params["environments"] = append(envs, environments...)
-
-	b, err := json.Marshal(params)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
-	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
-	b, err = json.Marshal(rm)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
+func (app App) GetBuildArtifact(buildSlug string, artifactSlug string) (startResponse StartResponse, err error){
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug))
 	if err != nil {
 		return StartResponse{}, nil
@@ -355,22 +301,18 @@ func (app App) GetBuildArtifact(buildSlug string, artifactSlug string, environme
 
 // DownloadArtifact ...
 func DownloadFile(filepath string, url string) error {
-
-	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
 
-	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
 }
