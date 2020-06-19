@@ -15,6 +15,7 @@ type Config struct {
 	AppSlug      string          `env:"BITRISE_APP_SLUG,required"`
 	AccessToken  stepconf.Secret `env:"access_token,required"`
 	BuildSlugs   string          `env:"buildslugs,required"`
+	SavePath   string            `env:"save_path"`
 	IsVerboseLog bool            `env:"verbose,required"`
 }
 
@@ -62,19 +63,24 @@ func main() {
 			failf("Failed to start build, error: %s", err)
 		}
 
-		for _, artifactSlug := range artifactSlugs {
-			artifact, err := app.getBuildArtifact(artifactSlug)
-			if err != nil {
-				return fmt.Errorf("failed to get artifact info, error: %s", err)
-			}
+		if cfg.SavePath != '' {
+			for _, artifactSlug := range artifactSlugs {
+				artifact, err := app.getBuildArtifact(artifactSlug)
+				if err != nil {
+					return fmt.Errorf("failed to get artifact info, error: %s", err)
+				}
 
-			artfactFile, err := app.DownloadArtifact(artifact.expiring_download_url);
-			if err != nil {
-				failf("Failed to download artifact, error: %s", err)
-			}
+				artfactFile, err := app.DownloadFile(artifact.expiring_download_url);
+				if err != nil {
+					failf("Failed to download artifact, error: %s", err)
+				}
 
-			// TODO write artfactFile to disk
-			
+				err := app.DownloadFile(cfg.SavePath, artifact.expiring_download_url)
+				if err != nil {
+					return fmt.Errorf("failed to download artifact, error: %s", err)
+				}
+				fmt.Infof("Downloaded: " + fileUrl + " to path " + cfg.SavePath)
+			}
 		}
 
 	}); err != nil {

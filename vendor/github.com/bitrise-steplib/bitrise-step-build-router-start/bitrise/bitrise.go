@@ -353,52 +353,25 @@ func (app App) GetBuildArtifact(buildSlug string, artifactSlug string, environme
 }
 
 // DownloadArtifact ...
-func (app App) DownloadArtifact(artifactUrl string) (startResponse StartResponse, err error){
+func DownloadFile(filepath string, url string) error {
 
-	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
-	b, err = json.Marshal(rm)
+	// Get the data
+	resp, err := http.Get(url)
 	if err != nil {
-		return StartResponse{}, nil
+		return err
 	}
+	defer resp.Body.Close()
 
-	req, err := http.NewRequest(http.MethodPost, artifactUrl))
+	// Create the file
+	out, err := os.Create(filepath)
 	if err != nil {
-		return StartResponse{}, nil
+		return err
 	}
-	req.Header.Add("Authorization", "token "+app.AccessToken)
+	defer out.Close()
 
-	retryReq, err := retryablehttp.FromRequest(req)
-	if err != nil {
-		return StartResponse{}, fmt.Errorf("failed to create retryable request: %s", err)
-	}
-
-	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
-
-	resp, err := retryClient.Do(retryReq)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil && err == nil {
-			err = cerr
-		}
-	}()
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return StartResponse{}, nil
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return StartResponse{}, fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
-	}
-
-	var response StartResponse
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return StartResponse{}, fmt.Errorf("failed to decode response, body: %s, error: %s", respBody, err)
-	}
-	return response, nil
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
 }
 
 // WaitForBuilds ...
