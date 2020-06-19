@@ -247,7 +247,7 @@ func (app App) GetBuildArtifacts(buildSlug string, environments []Environment) (
 		return StartResponse{}, nil
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug)))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug))
 	if err != nil {
 		return StartResponse{}, nil
 	}
@@ -313,7 +313,7 @@ func (app App) GetBuildArtifact(buildSlug string, artifactSlug string, environme
 		return StartResponse{}, nil
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug)))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug))
 	if err != nil {
 		return StartResponse{}, nil
 	}
