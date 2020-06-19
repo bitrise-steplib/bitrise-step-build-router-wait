@@ -220,6 +220,187 @@ func (app App) StartBuild(workflow string, buildParams json.RawMessage, buildNum
 	return response, nil
 }
 
+// GetBuildArtifacts ...
+func (app App) GetBuildArtifacts(buildSlug string, environments []Environment) (startResponse StartResponse, err error){
+	var params map[string]interface{}
+	if err := json.Unmarshal(buildParams, &params); err != nil {
+		return StartResponse{}, err
+	}
+
+	sourceBuildNumber := Environment{
+		MappedTo: "SOURCE_BITRISE_BUILD_NUMBER",
+		Value:    buildNumber,
+	}
+
+	envs := []Environment{sourceBuildNumber}
+	params["environments"] = append(envs, environments...)
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
+	b, err = json.Marshal(rm)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts", app.BaseURL, app.Slug, buildSlug)))
+	if err != nil {
+		return StartResponse{}, nil
+	}
+	req.Header.Add("Authorization", "token "+app.AccessToken)
+
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return StartResponse{}, fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := retryClient.Do(retryReq)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return StartResponse{}, fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
+	}
+
+	var response StartResponse
+	if err := json.Unmarshal(respBody, &response); err != nil {
+		return StartResponse{}, fmt.Errorf("failed to decode response, body: %s, error: %s", respBody, err)
+	}
+	return response, nil
+}
+
+// GetBuildArtifact ...
+func (app App) GetBuildArtifact(buildSlug string, artifactSlug string, environments []Environment) (startResponse StartResponse, err error){
+	var params map[string]interface{}
+	if err := json.Unmarshal(buildParams, &params); err != nil {
+		return StartResponse{}, err
+	}
+
+	sourceBuildNumber := Environment{
+		MappedTo: "SOURCE_BITRISE_BUILD_NUMBER",
+		Value:    buildNumber,
+	}
+
+	envs := []Environment{sourceBuildNumber}
+	params["environments"] = append(envs, environments...)
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
+	b, err = json.Marshal(rm)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/artifacts/%s", app.BaseURL, app.Slug, buildSlug, artifactSlug)))
+	if err != nil {
+		return StartResponse{}, nil
+	}
+	req.Header.Add("Authorization", "token "+app.AccessToken)
+
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return StartResponse{}, fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := retryClient.Do(retryReq)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return StartResponse{}, fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
+	}
+
+	var response StartResponse
+	if err := json.Unmarshal(respBody, &response); err != nil {
+		return StartResponse{}, fmt.Errorf("failed to decode response, body: %s, error: %s", respBody, err)
+	}
+	return response, nil
+}
+
+// DownloadArtifact ...
+func (app App) DownloadArtifact(artifactUrl string) (startResponse StartResponse, err error){
+
+	rm := startRequest{HookInfo: hookInfo{Type: "bitrise"}, BuildParams: b}
+	b, err = json.Marshal(rm)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	req, err := http.NewRequest(http.MethodPost, artifactUrl))
+	if err != nil {
+		return StartResponse{}, nil
+	}
+	req.Header.Add("Authorization", "token "+app.AccessToken)
+
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return StartResponse{}, fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := retryClient.Do(retryReq)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return StartResponse{}, nil
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return StartResponse{}, fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
+	}
+
+	var response StartResponse
+	if err := json.Unmarshal(respBody, &response); err != nil {
+		return StartResponse{}, fmt.Errorf("failed to decode response, body: %s, error: %s", respBody, err)
+	}
+	return response, nil
+}
+
 // WaitForBuilds ...
 func (app App) WaitForBuilds(buildSlugs []string, statusChangeCallback func(build Build)) error {
 	failed := false

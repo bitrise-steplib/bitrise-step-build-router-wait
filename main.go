@@ -34,6 +34,8 @@ func main() {
 
 	log.SetEnableDebugLog(cfg.IsVerboseLog)
 
+	environments := createEnvs(cfg.Environments)
+
 	app := bitrise.NewAppWithDefaultURL(cfg.AppSlug, string(cfg.AccessToken))
 
 	log.Infof("Waiting for builds:")
@@ -54,6 +56,27 @@ func main() {
 		case 4:
 			log.Infof("- %s cancelled %s", build.TriggeredWorkflow, buildURL)
 		}
+
+		artifactSlugs, err := app.getBuildArtifacts(buildSlugs, environments);
+		if err != nil {
+			failf("Failed to start build, error: %s", err)
+		}
+
+		for _, artifactSlug := range artifactSlugs {
+			artifact, err := app.getBuildArtifact(artifactSlug)
+			if err != nil {
+				return fmt.Errorf("failed to get artifact info, error: %s", err)
+			}
+
+			artfactFile, err := app.DownloadArtifact(artifact.expiring_download_url);
+			if err != nil {
+				failf("Failed to download artifact, error: %s", err)
+			}
+
+			// TODO write artfactFile to disk
+			
+		}
+
 	}); err != nil {
 		failf("An error occurred: %s", err)
 	}
