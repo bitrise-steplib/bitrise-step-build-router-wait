@@ -43,7 +43,6 @@ func main() {
 
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
 		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
-
 		switch build.Status {
 		case 0:
 			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
