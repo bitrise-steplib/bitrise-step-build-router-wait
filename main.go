@@ -59,17 +59,17 @@ func main() {
 			if cfg.SavePath != "" {
 				artifactsResponse, err := app.GetBuildArtifacts(build.Slug)
 				if err != nil {
-					failf("Failed to start build, error: %s", err)
+					log.Warnf("failed to get build artifacts, error: %s", err)
 				}
 				for _, artifactSlug := range artifactsResponse.ArtifactSlugs {
 					artifactObj, err := app.GetBuildArtifact(build.Slug, artifactSlug.ArtifactSlug)
 					if err != nil {
-						failf("failed to get artifact info, error: %s", err)
+						log.Warnf("failed to get build artifact, error: %s", err)
 					}
 
 					downloadErr := app.DownloadArtifact(cfg.SavePath+artifactObj.Artifact.ArtifactTitle, artifactObj.Artifact.ArtifactURL)
 					if downloadErr != nil {
-						failf("Failed to download artifact, error: %s", downloadErr)
+						log.Warnf("failed to download artifact, error: %s", downloadErr)
 					}
 					log.Donef("Downloaded: " + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
 				}
