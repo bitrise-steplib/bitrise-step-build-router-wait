@@ -65,8 +65,8 @@ type BuildArtifactResponse struct {
 
 // BuildArtifact ...
 type BuildArtifact struct {
-	ArtifactURL   string `json:"expiring_download_url"`
-	ArtifactTitle string `json:"title"`
+	DownloadURL string `json:"expiring_download_url"`
+	Title       string `json:"title"`
 }
 
 // Environment ...

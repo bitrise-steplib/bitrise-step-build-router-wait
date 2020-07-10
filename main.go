@@ -68,11 +68,11 @@ func main() {
 						failf("failed to get artifact info, error: %s", err)
 					}
 
-					downloadErr := app.DownloadArtifact(cfg.SavePath+artifactObj.Artifact.ArtifactTitle, artifactObj.Artifact.ArtifactURL)
+					downloadErr := app.DownloadArtifact(cfg.SavePath+artifactObj.Artifact.Title, artifactObj.Artifact.DownloadURL)
 					if downloadErr != nil {
 						failf("Failed to download artifact, error: %s", downloadErr)
 					}
-					log.Donef("Downloaded: " + artifactObj.Artifact.ArtifactTitle + " to path " + cfg.SavePath)
+					log.Donef("Downloaded: " + artifactObj.Artifact.Title + " to path " + cfg.SavePath)
 				}
 			}
 		}
