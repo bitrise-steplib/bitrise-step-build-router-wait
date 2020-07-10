@@ -43,7 +43,6 @@ func main() {
 
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
 		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
-
 		switch build.Status {
 		case 0:
 			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
@@ -60,17 +59,17 @@ func main() {
 			if cfg.SavePath != "" {
 				artifactsResponse, err := app.GetBuildArtifacts(build.Slug)
 				if err != nil {
-					failf("Failed to start build, error: %s", err)
+					log.Warnf("failed to get build artifacts, error: %s", err)
 				}
 				for _, artifactSlug := range artifactsResponse.ArtifactSlugs {
 					artifactObj, err := app.GetBuildArtifact(build.Slug, artifactSlug.ArtifactSlug)
 					if err != nil {
-						failf("failed to get artifact info, error: %s", err)
+						log.Warnf("failed to get build artifact, error: %s", err)
 					}
 
 					downloadErr := app.DownloadArtifact(cfg.SavePath+artifactObj.Artifact.Title, artifactObj.Artifact.DownloadURL)
 					if downloadErr != nil {
-						failf("Failed to download artifact, error: %s", downloadErr)
+						log.Warnf("failed to download artifact, error: %s", downloadErr)
 					}
 					log.Donef("Downloaded: " + artifactObj.Artifact.Title + " to path " + cfg.SavePath)
 				}
