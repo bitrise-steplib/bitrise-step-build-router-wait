@@ -12,10 +12,11 @@ import (
 
 // Config ...
 type Config struct {
-	AppSlug      string          `env:"BITRISE_APP_SLUG,required"`
-	AccessToken  stepconf.Secret `env:"access_token,required"`
-	BuildSlugs   string          `env:"buildslugs,required"`
-	IsVerboseLog bool            `env:"verbose,required"`
+	AppSlug                string          `env:"BITRISE_APP_SLUG,required"`
+	AccessToken            stepconf.Secret `env:"access_token,required"`
+	BuildSlugs             string          `env:"buildslugs,required"`
+	BuildArtifactsSavePath string          `env:"build_artifacts_save_path"`
+	IsVerboseLog           bool            `env:"verbose,required"`
 }
 
 func failf(s string, a ...interface{}) {
@@ -53,6 +54,26 @@ func main() {
 			log.Warnf("- %s aborted %s", build.TriggeredWorkflow, buildURL)
 		case 4:
 			log.Infof("- %s cancelled %s", build.TriggeredWorkflow, buildURL)
+		}
+		if build.Status != 0 {
+			if strings.TrimSpace(cfg.BuildArtifactsSavePath) != "" {
+				artifactsResponse, err := build.GetBuildArtifacts(app)
+				if err != nil {
+					log.Warnf("failed to get build artifacts, error: %s", err)
+				}
+				for _, artifactSlug := range artifactsResponse.ArtifactSlugs {
+					artifactObj, err := build.GetBuildArtifact(app, artifactSlug.ArtifactSlug)
+					if err != nil {
+						log.Warnf("failed to get build artifact, error: %s", err)
+					}
+
+					downloadErr := artifactObj.Artifact.DownloadArtifact(strings.TrimSpace(cfg.BuildArtifactsSavePath) + artifactObj.Artifact.Title)
+					if downloadErr != nil {
+						log.Warnf("failed to download artifact, error: %s", downloadErr)
+					}
+					log.Donef("Downloaded: " + artifactObj.Artifact.Title + " to path " + strings.TrimSpace(cfg.BuildArtifactsSavePath))
+				}
+			}
 		}
 	}); err != nil {
 		failf("An error occurred: %s", err)
