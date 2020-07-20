@@ -35,7 +35,7 @@ inputs:
       summary: The build slug(s) to check. One build slug per line.
       description: The build slug(s) to check. One build slug per line.
       is_required: true
-  - save_path:
+  - build_artifacts_save_path:
     opts:
       title: Path to save the Artifacts in (leave empty to not save artifacts)
       summary: This is where the artifacts will be saved to

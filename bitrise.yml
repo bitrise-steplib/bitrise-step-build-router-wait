@@ -25,7 +25,7 @@ workflows:
     - path::./:
         inputs:
         - access_token: $ACCESS_TOKEN
-        - save_path: $SAVE_PATH
+        - build_artifacts_save_path: $BUILD_ARTIFACTS_SAVE_PATH
         - verbose: true
 
   # ----------------------------------------------------------------
