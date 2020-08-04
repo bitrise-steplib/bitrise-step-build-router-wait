@@ -63,7 +63,7 @@ func main() {
 
 		if cfg.AbortBuildsOnFail == "yes" && build.Status != 0 && build.Status != 1 {
 			for _, buildSlug := range buildSlugs {
-				abortErr := app.AbortBuild(buildSlug, "Build https://app.bitrise.io/build/"+build.Slug+" "+failReason+" triggering build https://app.bitrise.io/build/"+buildSlug+" to abort")
+				abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
 				if abortErr != nil {
 					log.Warnf("failed to abort build, error: %s", abortErr)
 				}

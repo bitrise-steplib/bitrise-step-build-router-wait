@@ -48,10 +48,6 @@ type StartResponse struct {
 	TriggeredWorkflow string `json:"triggered_workflow"`
 }
 
-type abortRequest struct {
-	BuildAbortParams json.RawMessage `json:"build-abort-params"`
-}
-
 // BuildArtifactsResponse ...
 type BuildArtifactsResponse struct {
 	ArtifactSlugs []BuildArtifactSlug `json:"data"`
@@ -367,11 +363,6 @@ func (app App) AbortBuild(buildSlug string, abortReason string) error {
 	params["skip_notifications"] = true
 
 	b, err := json.Marshal(params)
-	if err != nil {
-		return nil
-	}
-	rm := abortRequest{BuildAbortParams: b}
-	b, err = json.Marshal(rm)
 	if err != nil {
 		return nil
 	}
