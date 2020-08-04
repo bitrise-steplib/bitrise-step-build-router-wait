@@ -52,13 +52,13 @@ func main() {
 			log.Donef("- %s successful %s)", build.TriggeredWorkflow, buildURL)
 		case 2:
 			log.Errorf("- %s failed", build.TriggeredWorkflow)
-			failReason = "Failed"
+			failReason = "failed"
 		case 3:
 			log.Warnf("- %s aborted", build.TriggeredWorkflow)
-			failReason = "Aborted"
+			failReason = "aborted"
 		case 4:
 			log.Infof("- %s cancelled", build.TriggeredWorkflow)
-			failReason = "Cancelled"
+			failReason = "cancelled"
 		}
 
 		if cfg.AbortBuildsOnFail == "yes" && build.Status != 0 && build.Status != 1 {
