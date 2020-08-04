@@ -48,6 +48,10 @@ type StartResponse struct {
 	TriggeredWorkflow string `json:"triggered_workflow"`
 }
 
+type abortRequest struct {
+	BuildAbortParams json.RawMessage `json:"build-abort-params"`
+}
+
 // BuildArtifactsResponse ...
 type BuildArtifactsResponse struct {
 	ArtifactSlugs []BuildArtifactSlug `json:"data"`
@@ -353,6 +357,58 @@ func (artifact BuildArtifact) DownloadArtifact(filepath string) error {
 
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+// AbortBuild ...
+func (app App) AbortBuild(buildSlug string, abortReason string) error {
+	params := make(map[string]interface{})
+	params["abort_reason"] = abortReason
+	params["abort_with_success"] = false
+	params["skip_notifications"] = true
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return nil
+	}
+	rm := abortRequest{BuildAbortParams: b}
+	b, err = json.Marshal(rm)
+	if err != nil {
+		return nil
+	}
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/v0.1/apps/%s/builds/%s/abort", app.BaseURL, app.Slug, buildSlug), bytes.NewReader(b))
+	if err != nil {
+		return nil
+	}
+	req.Header.Add("Authorization", "token "+app.AccessToken)
+
+	retryReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return fmt.Errorf("failed to create retryable request: %s", err)
+	}
+
+	retryClient := NewRetryableClient(app.IsDebugRetryTimings)
+
+	resp, err := retryClient.Do(retryReq)
+	if err != nil {
+		return nil
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("failed to get response, statuscode: %d, body: %s", resp.StatusCode, respBody)
+	}
+	return nil
 }
 
 // WaitForBuilds ...
