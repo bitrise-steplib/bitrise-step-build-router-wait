@@ -43,7 +43,7 @@ func main() {
 	buildSlugs := strings.Split(cfg.BuildSlugs, "\n")
 
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
-		failReason := ""
+		var failReason string
 		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
 		switch build.Status {
 		case 0:
@@ -61,7 +61,7 @@ func main() {
 			failReason = "cancelled"
 		}
 
-		if cfg.AbortBuildsOnFail == "yes" && build.Status != 0 && build.Status != 1 {
+		if cfg.AbortBuildsOnFail == "yes" && build.Status > 1 {
 			for _, buildSlug := range buildSlugs {
 				abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
 				if abortErr != nil {
