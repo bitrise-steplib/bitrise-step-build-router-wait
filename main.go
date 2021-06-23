@@ -74,7 +74,7 @@ func main() {
 		}
 		if build.Status != 0 {
 			if strings.TrimSpace(cfg.BuildArtifactsSavePath) != "" {
-				fullBuildArtifactsSavePath := strings.trimSuffix(cfg.BuildArtifactsSavePath, "/") + "/"
+				fullBuildArtifactsSavePath := strings.TrimSuffix(cfg.BuildArtifactsSavePath, "/") + "/"
 				artifactsResponse, err := build.GetBuildArtifacts(app)
 				if err != nil {
 					log.Warnf("failed to get build artifacts, error: %s", err)
