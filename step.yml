@@ -1,7 +1,7 @@
 title: "Bitrise Wait for Build"
 summary: "The Step pauses the current build until another running build is finished."
 description: |-
-  "The Step pauses the current build until another running build or builds are finished. The Step checks statuses of the builds defined in the Step. The builds are defined in the **Build slugs** input: you can add these slugs manually but the typical use case is to use the Environment Variable exported by the **Bitrise Start Build** Step. 
+   The Step pauses the current build until another running build or builds are finished. The Step checks statuses of the builds defined in the Step. The builds are defined in the **Build slugs** input: you can add these slugs manually but the typical use case is to use the Environment Variable exported by the **Bitrise Start Build** Step. 
 
    As long as the builds defined by the slugs are running, the Step will hold the build it is running in. The build will fail if any of the builds included in the Step fail.
    
@@ -16,12 +16,13 @@ description: |-
     2. Add the **Bitrise Start Build** Step to the part of the Workflow where you want to trigger another build. 
     3. Add the Secret Env Var storing your Personal Access Token to the **Bitrise Access Token** input of the **Bitrise Start Build** Step: click the **Select secret variable** button, and choose the key you created.
     4. Find the **Workflows** input of the **Bitrise Start Build** Step, and add the Workflow(s) you want to run. 
-    5. In the **Environments to share** input, add Environment Variables (Env Vars) that you want to share between the builds triggered by the Step. 
-    6. Add the **Bitrise Wait for Build** Step to the end of Workflow that contains the **Bitrise Start Build** Step. 
-    7. Add the Secret Env Var storing your Personal Access Token to the **Bitrise Access Token** input of the **Bitrise Wait for Build** Step: click the **Select secret variable** button, and choose the key you created.
-    8. In the **Build slugs** input, define the builds for the Step. 
+    5. In the **Environments to share** input, add Environment Variables (Env Vars) that you want to share between the builds triggered by the Step.
+    6. Optionally, you can add any Step you would like to run in parallel while the triggered Workflow(s) are running in the parent Workflow.
+    7. Add the **Bitrise Wait for Build** Step to the end of Workflow that contains the **Bitrise Start Build** Step. 
+    8. Add the Secret Env Var storing your Personal Access Token to the **Bitrise Access Token** input of the **Bitrise Wait for Build** Step: click the **Select secret variable** button, and choose the key you created.
+    9. In the **Build slugs** input, define the builds for the Step. 
        The build slugs you need are stored by the **Bitrise Start Build** Step in the `$ROUTER_STARTED_BUILD_SLUGS` Env Var. As long as the builds defined by the slugs are running, the Step will hold the build it is running in. The build will fail if any of the builds included in the Step fail.
-    9. Optionally, you can save the build artifacts from the builds and configure the Step to abort all builds if any of the builds fail:
+    10. Optionally, you can save the build artifacts from the builds and configure the Step to abort all builds if any of the builds fail:
        - In **The path of the build artifacts** input, set where you'd like to save the artifacts. 
        - Set the **Abort all builds if one fails** input to either `yes` or `no`.
     
@@ -33,10 +34,11 @@ description: |-
     ### Useful links 
  
     - [Starting parallel builds with a single Workflow](https://devcenter.bitrise.io/builds/triggering-builds/trigger-multiple-workflows/)
+    - [Start builds from a parent Workflow](https://devcenter.bitrise.io/en/steps-and-workflows/generic-workflow-recipes/start--parallel--builds-from-the-workflow.html)
  
     ### Related Steps 
  
-    - [Bitrise Start Build](https://www.bitrise.io/integrations/steps/build-router-wait)
+    - [Bitrise Start Build](https://www.bitrise.io/integrations/steps/build-router-start)
     - [Bitrise Run](https://www.bitrise.io/integrations/steps/bitrise-run)
     - [Build Status Change](https://www.bitrise.io/integrations/steps/build-status-change)
  
