@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 	"path/filepath"
+	"strings"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-utils/log"
@@ -62,7 +62,7 @@ func main() {
 			failReason = "cancelled"
 		}
 
-		if cfg.AbortBuildsOnFail == "yes" && build.Status > 1 {
+		if cfg.AbortBuildsOnFail == "yes" && (build.IsAborted() || build.IsFailed()) {
 			for _, buildSlug := range buildSlugs {
 				if buildSlug != build.Slug {
 					abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
