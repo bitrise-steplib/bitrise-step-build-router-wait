@@ -59,7 +59,6 @@ func main() {
 			failReason = "aborted"
 		} else if build.IsAbortedWithSuccess() {
 			log.Infof("- %s cancelled", build.TriggeredWorkflow)
-			failReason = "cancelled"
 		}
 
 		if cfg.AbortBuildsOnFail == "yes" && (build.IsAborted() || build.IsFailed()) {
