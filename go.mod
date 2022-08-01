@@ -3,9 +3,9 @@ module github.com/bitrise-steplib/bitrise-step-build-router-wait
 go 1.18
 
 require (
-	github.com/bitrise-io/go-steputils v1.0.2
+	github.com/bitrise-io/go-steputils v1.0.3
 	github.com/bitrise-io/go-utils v1.0.2
-	github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220317090924-136adfe555dd
+	github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220801154232-931fe89f1d06
 )
 
 require (

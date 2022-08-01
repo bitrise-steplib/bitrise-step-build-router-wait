@@ -1,4 +1,4 @@
-# github.com/bitrise-io/go-steputils v1.0.2
+# github.com/bitrise-io/go-steputils v1.0.3
 ## explicit; go 1.15
 github.com/bitrise-io/go-steputils/stepconf
 # github.com/bitrise-io/go-utils v1.0.2
@@ -7,7 +7,7 @@ github.com/bitrise-io/go-utils/colorstring
 github.com/bitrise-io/go-utils/log
 github.com/bitrise-io/go-utils/parseutil
 github.com/bitrise-io/go-utils/pointers
-# github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220317090924-136adfe555dd
+# github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220801154232-931fe89f1d06
 ## explicit; go 1.17
 github.com/bitrise-steplib/bitrise-step-build-router-start/bitrise
 # github.com/hashicorp/go-cleanhttp v0.5.2
