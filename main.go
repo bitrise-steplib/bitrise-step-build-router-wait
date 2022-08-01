@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 	"path/filepath"
+	"strings"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-utils/log"
@@ -46,23 +46,22 @@ func main() {
 	if err := app.WaitForBuilds(buildSlugs, func(build bitrise.Build) {
 		var failReason string
 		var buildURL = fmt.Sprintf("(https://app.bitrise.io/build/%s)", build.Slug)
-		switch build.Status {
-		case 0:
+
+		if build.IsRunning() {
 			log.Printf("- %s %s %s", build.TriggeredWorkflow, build.StatusText, buildURL)
-		case 1:
+		} else if build.IsSuccessful() {
 			log.Donef("- %s successful %s)", build.TriggeredWorkflow, buildURL)
-		case 2:
+		} else if build.IsFailed() {
 			log.Errorf("- %s failed", build.TriggeredWorkflow)
 			failReason = "failed"
-		case 3:
+		} else if build.IsAborted() {
 			log.Warnf("- %s aborted", build.TriggeredWorkflow)
 			failReason = "aborted"
-		case 4:
+		} else if build.IsAbortedWithSuccess() {
 			log.Infof("- %s cancelled", build.TriggeredWorkflow)
-			failReason = "cancelled"
 		}
 
-		if cfg.AbortBuildsOnFail == "yes" && build.Status > 1 {
+		if cfg.AbortBuildsOnFail == "yes" && (build.IsAborted() || build.IsFailed()) {
 			for _, buildSlug := range buildSlugs {
 				if buildSlug != build.Slug {
 					abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
@@ -73,7 +72,7 @@ func main() {
 				}
 			}
 		}
-		if build.Status != 0 {
+		if build.IsRunning() == false {
 			buildArtifactSaveDir := strings.TrimSpace(cfg.BuildArtifactsSavePath)
 			if buildArtifactSaveDir != "" {
 				artifactsResponse, err := build.GetBuildArtifacts(app)

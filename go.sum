@@ -1,10 +1,10 @@
-github.com/bitrise-io/go-steputils v1.0.2 h1:BEFG87r7uA/Yabk4SmuxP2yOgjjO+YGsDOYXtUH8IJ0=
-github.com/bitrise-io/go-steputils v1.0.2/go.mod h1:YIUaQnIAyK4pCvQG0hYHVkSzKNT9uL2FWmkFNW4mfNI=
+github.com/bitrise-io/go-steputils v1.0.3 h1:8LbmyMVVttwu6TUmBMTHgcaDNFWvUwFfoP+1gAXvPLs=
+github.com/bitrise-io/go-steputils v1.0.3/go.mod h1:YIUaQnIAyK4pCvQG0hYHVkSzKNT9uL2FWmkFNW4mfNI=
 github.com/bitrise-io/go-utils v1.0.1/go.mod h1:ZY1DI+fEpZuFpO9szgDeICM4QbqoWVt0RSY3tRI1heY=
 github.com/bitrise-io/go-utils v1.0.2 h1:w4Mz2IvrgDzrFJECuHdvsK1LHO30cdtuy9bBa7Lw2c0=
 github.com/bitrise-io/go-utils v1.0.2/go.mod h1:ZY1DI+fEpZuFpO9szgDeICM4QbqoWVt0RSY3tRI1heY=
-github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220317090924-136adfe555dd h1:pahX1U7Z5Cf5K79ntWPLbBXPSHtT+DzUvpi5qE9HrOQ=
-github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220317090924-136adfe555dd/go.mod h1:eqkrBxRBN1lnExJ9A6g/dJAv2RyHoI2S5HNJMqfAJDU=
+github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220801154232-931fe89f1d06 h1:8k4I2ZW/alBhOdn0Mba+ZjrMj/hvPHTkdvqqLMqBUnE=
+github.com/bitrise-steplib/bitrise-step-build-router-start v0.0.0-20220801154232-931fe89f1d06/go.mod h1:eqkrBxRBN1lnExJ9A6g/dJAv2RyHoI2S5HNJMqfAJDU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
