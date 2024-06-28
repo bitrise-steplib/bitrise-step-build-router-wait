@@ -13,12 +13,12 @@ github.com/bitrise-steplib/bitrise-step-build-router-start/bitrise
 # github.com/hashicorp/go-cleanhttp v0.5.2
 ## explicit; go 1.13
 github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-hclog v1.2.1
+# github.com/hashicorp/go-hclog v1.6.3
 ## explicit; go 1.13
-# github.com/hashicorp/go-retryablehttp v0.7.1
-## explicit; go 1.13
+# github.com/hashicorp/go-retryablehttp v0.7.7
+## explicit; go 1.19
 github.com/hashicorp/go-retryablehttp
 # github.com/stretchr/testify v1.7.2
 ## explicit; go 1.13
-# golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b
-## explicit; go 1.17
+# golang.org/x/sys v0.20.0
+## explicit; go 1.18
